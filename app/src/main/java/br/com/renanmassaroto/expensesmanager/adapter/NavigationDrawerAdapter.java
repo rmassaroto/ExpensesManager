@@ -25,8 +25,9 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     private static final int VIEW_TYPE_DIVIDER = 2;
 
     private Context context;
-
     private ArrayList<Account> accountsArrayList;
+
+    private View.OnClickListener listener;
 
     public static class BaseViewHolder extends RecyclerView.ViewHolder {
         public BaseViewHolder(View view) {
@@ -61,14 +62,10 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         }
     }
 
-    public NavigationDrawerAdapter(Context context) {
+    public NavigationDrawerAdapter(Context context, View.OnClickListener listener) {
         this.context = context;
+        this.listener = listener;
         this.accountsArrayList = new ArrayList<>();
-    }
-
-    public NavigationDrawerAdapter(Context context, ArrayList<Account> accountsArrayList) {
-        this.context = context;
-        this.accountsArrayList = accountsArrayList;
     }
 
     @Override
@@ -85,6 +82,10 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
                 return viewHolder;
             case VIEW_TYPE_LIST_ITEM:
                 view = LayoutInflater.from(context).inflate(R.layout.list_item_1, parent, false);
+
+                if (listener != null) {
+                    view.setOnClickListener(listener);
+                }
 
                 viewHolder = new ListItemViewHolder(view);
 
@@ -213,5 +214,59 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         } else {
             return VIEW_TYPE_LIST_ITEM;
         }
+    }
+
+    public String getItemName(int position) {
+        if (accountsArrayList.size() > 0) {
+            if (position == 0) {
+                return null;
+            } else if (position == 1) {
+                return context.getString(R.string.overview_activity_name);
+            } else if (position == 2) {
+                return context.getString(R.string.history_activity_name);
+            } else if (position == 3) {
+                return context.getString(R.string.distribution_activity_name);
+            } else if (position == 4) {
+                return context.getString(R.string.wishlist_activity_name);
+            } else if (position == 5) {
+                // Divider
+                return null;
+            } else if (position == 7 + accountsArrayList.size() - 1) {
+                // Divider
+                return null;
+            } else if (position == 8 + accountsArrayList.size() - 1) {
+                return context.getString(R.string.account_management_activity_name);
+            } else if (position == 9 + accountsArrayList.size() - 1) {
+                return context.getString(R.string.categories_management_activity_name);
+            } else if (position == 10 + accountsArrayList.size() - 1) {
+                return context.getString(R.string.settings_activity_name);
+            } else {
+                //Accounts
+                return accountsArrayList.get(position - 6).getName();
+            }
+        } else {
+            if (position == 0) {
+                return null;
+            } else if (position == 1) {
+                return context.getString(R.string.overview_activity_name);
+            } else if (position == 2) {
+                return context.getString(R.string.history_activity_name);
+            } else if (position == 3) {
+                return context.getString(R.string.distribution_activity_name);
+            } else if (position == 4) {
+                return context.getString(R.string.wishlist_activity_name);
+            } else if (position == 5) {
+                // Divider
+                return null;
+            } else if (position == 6) {
+                return context.getString(R.string.account_management_activity_name);
+            } else if (position == 7) {
+                return context.getString(R.string.categories_management_activity_name);
+            } else if (position == 8) {
+                return context.getString(R.string.settings_activity_name);
+            }
+        }
+
+        return null;
     }
 }

@@ -8,7 +8,6 @@
     tools:context=".MainActivity">
 
 
-
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,24 +22,24 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/content_overview" />
 
     <View
         android:id="@+id/showing_secondary_fab_screen_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
         android:alpha="0.8"
-        android:visibility="gone"
-        android:clickable="true"/>
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_gravity="bottom|end"
+        android:background="#0F0"
         android:gravity="center_horizontal"
-        android:background="#0F0">
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/fab_secondary_line"
@@ -56,8 +55,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add fund"
-                    android:layout_margin="4dp"/>
+                    android:layout_margin="4dp"
+                    android:text="Add fund" />
 
             </android.support.v7.widget.CardView>
 
@@ -67,9 +66,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/fab_margin"
                 android:src="@android:drawable/ic_dialog_email"
-                app:fabSize="mini"
                 android:visibility="invisible"
-                tools:visibility="visible"/>
+                app:fabSize="mini"
+                tools:visibility="visible" />
 
         </LinearLayout>
 
@@ -86,8 +85,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add item"
-                    android:layout_margin="4dp"/>
+                    android:layout_margin="4dp"
+                    android:text="Add item" />
 
             </android.support.v7.widget.CardView>
 
@@ -101,9 +100,7 @@
         </LinearLayout>
 
 
-
     </LinearLayout>
-
 
 
 </android.support.design.widget.CoordinatorLayout>

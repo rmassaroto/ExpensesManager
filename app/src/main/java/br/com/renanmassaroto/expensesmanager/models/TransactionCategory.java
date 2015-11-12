@@ -9,7 +9,12 @@ public class TransactionCategory {
     private String name;
     private String colorHex;
 
+    public TransactionCategory() {
+        this.id = -1;
+    }
+
     public TransactionCategory(String name, String colorHex) {
+        this.id = -1;
         this.name = name;
         this.colorHex = colorHex;
     }

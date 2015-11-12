@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Debug;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -24,7 +25,7 @@ public class TransactionCategoryDatabaseHelper {
     }
 
     public interface OnTransactionCategoriesGotListener {
-        void onTransactionCategoriesGot(ArrayList<TransactionCategory> transactionCategoriesArrayList);
+        void onTransactionCategoriesGot(ArrayList<TransactionCategory> transactionCategoriesArrayList, int lastOffset);
     }
 
     public static void addTransactionCategory(Context context,
@@ -51,10 +52,16 @@ public class TransactionCategoryDatabaseHelper {
 
                 if (newRowId != -1) {
                     transactionCategory.setId(newRowId);
-                    listener.onTransactionCategoryAdded(transactionCategory, true);
+
+                    Log.d("TransactionCategoryDH", "Added transaction " + transactionCategory.getName());
+
+                    if (listener != null)
+                        listener.onTransactionCategoryAdded(transactionCategory, true);
                 } else {
                     transactionCategory.setId(-1);
-                    listener.onTransactionCategoryAdded(transactionCategory, false);
+
+                    if (listener != null)
+                        listener.onTransactionCategoryAdded(transactionCategory, false);
                 }
             }
         });
@@ -105,8 +112,8 @@ public class TransactionCategoryDatabaseHelper {
         });
     }
 
-    public static void listTransactionCategories(Context context, final int offset
-            , final OnTransactionCategoriesGotListener listener) {
+    public static void listTransactionCategories(Context context, final int offset,
+                                                 final OnTransactionCategoriesGotListener listener) {
         DatabaseHelper mDatabaseHelper = new DatabaseHelper(context);
 
         mDatabaseHelper.getReadableDatabaseAsync(new DatabaseHelper.OnDatabaseGotListener() {
@@ -134,7 +141,8 @@ public class TransactionCategoryDatabaseHelper {
                 String limit = "20";
 
                 if (offset > -1)
-                    limit = Integer.toString(offset) + ",20";
+//                    limit = "OFFSET " + Integer.toString(offset * 20);
+                    limit = Integer.toString(offset * 20) + ", 20";
 
                 Cursor mCursor = sqLiteDatabase.query(
                         DatabaseContract.TransactionCategories.TABLE_NAME,
@@ -162,7 +170,7 @@ public class TransactionCategoryDatabaseHelper {
                     transactionCategoriesArrayList.add(mTransactionCategory);
                 }
 
-                listener.onTransactionCategoriesGot(transactionCategoriesArrayList);
+                listener.onTransactionCategoriesGot(transactionCategoriesArrayList, offset);
             }
         });
     }

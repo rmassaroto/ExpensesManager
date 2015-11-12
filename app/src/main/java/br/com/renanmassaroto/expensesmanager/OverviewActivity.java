@@ -1,5 +1,6 @@
 package br.com.renanmassaroto.expensesmanager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,21 +9,17 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import java.util.ArrayList;
+import android.view.View;
 
 import br.com.renanmassaroto.expensesmanager.adapter.NavigationDrawerAdapter;
-import br.com.renanmassaroto.expensesmanager.database.TransactionCategoryDatabaseHelper;
-import br.com.renanmassaroto.expensesmanager.models.TransactionCategory;
 
 public class OverviewActivity extends AppCompatActivity {
 //        implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView navDrawerRecyclerView;
-    private LinearLayoutManager navDrawerLayoutManager;
+    private LinearLayoutManager navDrawerLinearLayoutManager;
     private NavigationDrawerAdapter navDrawerAdapter;
 
 //    private View showingSecondaryFabOverlay;
@@ -34,7 +31,7 @@ public class OverviewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_overview);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -45,11 +42,11 @@ public class OverviewActivity extends AppCompatActivity {
         navDrawerRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        navDrawerLayoutManager = new LinearLayoutManager(this);
-        navDrawerRecyclerView.setLayoutManager(navDrawerLayoutManager);
+        navDrawerLinearLayoutManager = new LinearLayoutManager(this);
+        navDrawerRecyclerView.setLayoutManager(navDrawerLinearLayoutManager);
 
         // specify an adapter (see also next example)
-        navDrawerAdapter = new NavigationDrawerAdapter(this);
+        navDrawerAdapter = new NavigationDrawerAdapter(this, new OnNavigationDrawerItemClickListener());
         navDrawerRecyclerView.setAdapter(navDrawerAdapter);
 
 //        showingSecondaryFabOverlay = findViewById(R.id.showing_secondary_fab_screen_overlay);
@@ -122,38 +119,7 @@ public class OverviewActivity extends AppCompatActivity {
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
     }
-
-//    public void getList(final int offset, final int pageNumber) {
-//        Log.d("getList", "Getting page " + Integer.toString(pageNumber) + " with offset " + Integer.toString(offset));
-//
-//        TransactionCategoryDatabaseHelper.listTransactionCategories(
-//                this,
-//                offset,
-//                new TransactionCategoryDatabaseHelper.OnTransactionCategoriesGotListener() {
-//                    @Override
-//                    public void onTransactionCategoriesGot(ArrayList<TransactionCategory> transactionCategoriesArrayList) {
-//                        if (transactionCategoriesArrayList != null) {
-//                            TransactionCategory lastTransaction = transactionCategoriesArrayList.get(
-//                                    transactionCategoriesArrayList.size() - 1
-//                            );
-//
-//                            getList(offset + transactionCategoriesArrayList.size(), pageNumber + 1);
-//
-//                            for (TransactionCategory transaction : transactionCategoriesArrayList) {
-//                                Log.d("OnCategoriesGotListener", "Found category " + transaction.getName());
-//                            }
-//
-//                        } else {
-//                            Log.d("OnCategoriesGotListener", "Finished getting categories");
-//                        }
-//                    }
-//                }
-//        );
-//    }
 
     @Override
     public void onBackPressed() {
@@ -187,28 +153,16 @@ public class OverviewActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camara) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
+    private class OnNavigationDrawerItemClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            int position = navDrawerRecyclerView.getChildAdapterPosition(view);
+
+            if (navDrawerAdapter.getItemName(position).equals(getString(R.string.categories_management_activity_name))) {
+                Intent mIntent = new Intent(OverviewActivity.this, CategoriesListActivity.class);
+                startActivity(mIntent);
+            }
+        }
+    }
 }

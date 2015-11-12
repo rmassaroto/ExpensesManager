@@ -1,6 +1,9 @@
 package br.com.renanmassaroto.expensesmanager.database;
 
+import android.content.ContentValues;
 import android.provider.BaseColumns;
+
+import java.util.ArrayList;
 
 /**
  * Created by renancardosomassaroto on 11/6/15.
