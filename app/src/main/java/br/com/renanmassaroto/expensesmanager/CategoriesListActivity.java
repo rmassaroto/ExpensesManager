@@ -1,14 +1,18 @@
 package br.com.renanmassaroto.expensesmanager;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
@@ -27,8 +31,48 @@ public class CategoriesListActivity extends AppCompatActivity implements Transac
     private LinearLayoutManager categoriesLinearLayoutManager;
     private CategoriesListAdapter categoriesListAdapter;
 
-    private int lastAskedPage = 0;
-    private int lastShowPage = -1;
+    private ActionMode mActionMode;
+
+    private LinearLayout emptyCategoriesListInfo;
+
+    private boolean loading = false;
+    private int page = 0;
+
+    private ActionMode.Callback mActionModeCallBack = new ActionMode.Callback() {
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.context_menu_categories_list, menu);
+
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_delete:
+                    //TODO: Delete
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +80,13 @@ public class CategoriesListActivity extends AppCompatActivity implements Transac
         setContentView(R.layout.activity_categories_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // This displays the up arrow on the toolbar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        emptyCategoriesListInfo = (LinearLayout) findViewById(R.id.empty_categories_list);
+        emptyCategoriesListInfo.setVisibility(View.INVISIBLE);
 
         categoriesRecyclerView = (RecyclerView) findViewById(R.id.categories_list_recycler_view);
 
@@ -53,9 +104,22 @@ public class CategoriesListActivity extends AppCompatActivity implements Transac
 
         categoriesRecyclerView.setAdapter(categoriesListAdapter);
 
-//        createDefaultValues();
+        categoriesRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int visibleItemCount = categoriesLinearLayoutManager.getChildCount();
+                int totalItemCount = categoriesLinearLayoutManager.getItemCount();
+                int pastVisibleItems = categoriesLinearLayoutManager.findFirstVisibleItemPosition();
 
-        getCategoriesListPage(0);
+                if (!loading) {
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        getCategoriesListPage(page);
+                    }
+                }
+            }
+        });
+
+        getCategoriesListPage(page);
     }
 
     @Override
@@ -77,18 +141,17 @@ public class CategoriesListActivity extends AppCompatActivity implements Transac
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            createDefaultValues();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            default:
+                onBackPressed();
+                return true;
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void getCategoriesListPage(int page) {
-        Log.d(LOG_TAG, "Getting page " + Integer.toString(page));
-        lastAskedPage = page;
+        loading = true;
 
         TransactionCategoryDatabaseHelper.listTransactionCategories(
                 this,
@@ -100,71 +163,42 @@ public class CategoriesListActivity extends AppCompatActivity implements Transac
     @Override
     public void onTransactionCategoriesGot(ArrayList<TransactionCategory> transactionCategoriesArrayList,
                                            int lastOffset) {
+        loading = false;
+        page++;
+
         if (transactionCategoriesArrayList != null) {
+
             Log.d(LOG_TAG, "Received a page with " + Integer.toString(transactionCategoriesArrayList.size()));
 
             categoriesListAdapter.addTransactionCategories(transactionCategoriesArrayList);
-
-//            getCategoriesListPage(lastOffset + 1);
         } else {
-//            Log.d(LOG_TAG, "Finished loading transaction categories with a total of " +
-//                    Integer.toString(lastOffset) + " pages and " + Integer.toString(categoriesListAdapter.getItemCount()) +
-//            " entries.");
+            if (categoriesListAdapter.getItemCount() == 0) {
+                emptyCategoriesListInfo.setVisibility(View.VISIBLE);
+            }
         }
-
-        lastShowPage = lastOffset;
-    }
-
-    public void createDefaultValues() {
-        TransactionCategory transactionCategory1 = new TransactionCategory(
-                "Lazer",
-                "#FF0000"
-        );
-
-        TransactionCategory transactionCategory2 = new TransactionCategory(
-                "Reparos",
-                "#00FF00"
-        );
-
-        TransactionCategory transactionCategory3 = new TransactionCategory(
-                "Educação",
-                "#0000FF"
-        );
-
-        TransactionCategory transactionCategory4 = new TransactionCategory(
-                "Outros",
-                "#000000"
-        );
-
-        TransactionCategoryDatabaseHelper.addTransactionCategory(
-                this,
-                transactionCategory1,
-                null
-        );
-
-        TransactionCategoryDatabaseHelper.addTransactionCategory(
-                this,
-                transactionCategory2,
-                null
-        );
-
-        TransactionCategoryDatabaseHelper.addTransactionCategory(
-                this,
-                transactionCategory3,
-                null
-        );
-
-        TransactionCategoryDatabaseHelper.addTransactionCategory(
-                this,
-                transactionCategory4,
-                null
-        );
     }
 
     private class OnCategoriesRecyclerViewItemClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View view) {
+            if (mActionMode == null) {
+                mActionMode = startSupportActionMode(mActionModeCallBack);
+            }
+
+            View item = categoriesRecyclerView.getChildAt((int) view.getTag());
+
+
+            if (item.isSelected()) {
+//                item.setBackgroundColor(getColor(R.color.white));
+                item.setBackground(null);
+
+                item.setSelected(false);
+            } else {
+                item.setBackgroundColor(getColor(R.color.dividerColor));
+
+                item.setSelected(true);
+            }
 
         }
     }

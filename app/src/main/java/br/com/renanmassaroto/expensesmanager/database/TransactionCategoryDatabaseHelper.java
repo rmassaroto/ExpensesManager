@@ -128,12 +128,6 @@ public class TransactionCategoryDatabaseHelper {
                         DatabaseContract.TransactionCategories.COLUMN_NAME_HEX_COLOR
                 };
 
-//                String selection = null;
-//                if (lastTransactionCategory != null) {
-//                    selection = DatabaseContract.TransactionCategories._ID + " > " +
-//                            lastTransactionCategory.getId();
-//                }
-
                 // Sort order
                 String sortOrder = DatabaseContract.TransactionCategories.COLUMN_NAME_NAME + " ASC";
 
@@ -141,7 +135,6 @@ public class TransactionCategoryDatabaseHelper {
                 String limit = "20";
 
                 if (offset > -1)
-//                    limit = "OFFSET " + Integer.toString(offset * 20);
                     limit = Integer.toString(offset * 20) + ", 20";
 
                 Cursor mCursor = sqLiteDatabase.query(

@@ -32,6 +32,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(DatabaseContract.TransactionCategories.SQL_CREATE_TRANSACTION_CATEGORIES);
         sqLiteDatabase.execSQL(DatabaseContract.Transactions.SQL_CREATE_TRANSACTIONS);
         sqLiteDatabase.execSQL(DatabaseContract.Wishlist.SQL_CREATE_WISHLIST);
+
+        sqLiteDatabase.execSQL(DatabaseContract.TransactionCategories.SQL_INSERT_DEFAULT_VALUES);
     }
 
     @Override

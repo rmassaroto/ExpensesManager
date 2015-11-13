@@ -90,6 +90,12 @@ public class DatabaseContract {
 
         public static final String SQL_DELETE_TRANSACTION_CATEGORIES =
                 "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        //TODO: Learn how to get strings in other languages here
+        public static final String SQL_INSERT_DEFAULT_VALUES =
+                "INSERT INTO " + TABLE_NAME + " (" + COLUMN_NAME_NAME + ", " + COLUMN_NAME_HEX_COLOR +
+                        ") VALUES ('Lazer', '#8bc34a'), ('Educação', '#3f51b5'), " +
+                        "('Entretenimento', '#9c27b0'), ('Saúde', '#f44336')";
     }
 
     public static class Transactions implements BaseColumns {

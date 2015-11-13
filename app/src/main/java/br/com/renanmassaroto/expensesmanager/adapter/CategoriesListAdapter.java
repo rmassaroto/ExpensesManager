@@ -2,6 +2,8 @@ package br.com.renanmassaroto.expensesmanager.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,13 +21,16 @@ import br.com.renanmassaroto.expensesmanager.models.TransactionCategory;
  */
 public class CategoriesListAdapter extends RecyclerView.Adapter<CategoriesListAdapter.ViewHolder> {
 
+    public static final String LOG_TAG = "CategoriesListAdapter";
+
     private Context context;
     private ArrayList<TransactionCategory> transactionCategoriesArrayList;
-    private View.OnClickListener listener;
 
-    public CategoriesListAdapter(Context context, View.OnClickListener listener) {
+    private View.OnClickListener iconClickListener;
+
+    public CategoriesListAdapter(Context context, View.OnClickListener iconClickListener) {
         this.context = context;
-        this.listener = listener;
+        this.iconClickListener = iconClickListener;
         this.transactionCategoriesArrayList = new ArrayList<>();
     }
 
@@ -33,18 +38,21 @@ public class CategoriesListAdapter extends RecyclerView.Adapter<CategoriesListAd
         TextView mIconTextView;
         TextView mTitleTextView;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, View.OnClickListener iconClickListener) {
             super(view);
 
             mIconTextView = (TextView) view.findViewById(R.id.text_1);
             mTitleTextView = (TextView) view.findViewById(R.id.text_2);
+
+            if (iconClickListener != null)
+                mIconTextView.setOnClickListener(iconClickListener);
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.list_item_2, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
+        ViewHolder viewHolder = new ViewHolder(view, iconClickListener);
 
         return viewHolder;
     }
@@ -53,10 +61,14 @@ public class CategoriesListAdapter extends RecyclerView.Adapter<CategoriesListAd
     public void onBindViewHolder(ViewHolder holder, int position) {
         TransactionCategory transactionCategory = transactionCategoriesArrayList.get(position);
 
-        holder.mIconTextView.setBackgroundColor(Color.parseColor(transactionCategory.getColorHex()));
+        Drawable iconBackgroundDrawable = holder.mIconTextView.getBackground();
+        iconBackgroundDrawable.setColorFilter(Color.parseColor(transactionCategory.getColorHex()),
+                PorterDuff.Mode.MULTIPLY);
 
         holder.mIconTextView.setText("" + transactionCategory.getName().charAt(0));
         holder.mTitleTextView.setText(transactionCategory.getName());
+
+        holder.mIconTextView.setTag(position);
     }
 
     @Override
@@ -67,7 +79,8 @@ public class CategoriesListAdapter extends RecyclerView.Adapter<CategoriesListAd
 
     public void addTransactionCategories(ArrayList<TransactionCategory> transactionCategoriesArrayList) {
         for (TransactionCategory transactionCategory : transactionCategoriesArrayList) {
-            Log.d("CategoriesListAdapter", "Added transaction category " + transactionCategory.getName() + " to adapter.");
+            Log.d("CategoriesListAdapter", "Added transaction category " + transactionCategory.getName() +
+                    " to adapter.");
             this.transactionCategoriesArrayList.add(transactionCategory);
 
             notifyItemInserted(this.transactionCategoriesArrayList.size() - 1);
